@@ -95,7 +95,7 @@ app.post('/events', (req, res) => {
     onValue(ref(database, '/events'), (snapshot) => {
         snapshot.forEach(ev => {
             onValue(ref(database, 'groups/' + ev.val()), (snap) => {
-                if(snap.size <= headcount)
+                if(snap.size < headcount)
                     events.push(ev.val());
             });
         });
