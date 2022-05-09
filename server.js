@@ -27,36 +27,6 @@ app.post('/', (req, res) => {
         res.send({
             message: "Adj meg rendes nevet!"
         });
-<<<<<<< HEAD
-    else {
-        name= name.replace('.','');
-        name= name.replace('#','');
-        name= name.replace('$','');
-        name= name.replace('[','');
-        name= name.replace(']','');
-
-        get(child(ref(getDatabase()), 'groups/' + event + '/' + name)).then((snapshot) => {
-            if(snapshot.exists()) {
-                res.send({
-                    message: "Már jelentkezett erre az előadásra vagy van valaki más, aki ezt a nevet használta. Kérem adja meg a nevét az apa kezdőbetűjével!"
-                });
-            }
-            else
-            {
-                set(ref(database, 'groups/' + event +  '/' + name), {
-                    class: category
-                });
-                res.send({
-                    message: "Kedves " + name + " sikeresen jelentkeztél a(z) " + event + " eseményre!"
-                });
-            }
-        }).catch((error) => {
-            res.send({
-                message: error
-            });
-        });
-    }
-=======
     else 
         if(!category || !event)
             res.send({
@@ -101,7 +71,6 @@ app.post('/saveheadcount', (req, res) => {
     res.send({
         message: "Létszám módosítva!"
     });
->>>>>>> 59b79d2 (Legfrisebb)
 });
 
 app.post('/classes', (req, res) => {  
@@ -118,13 +87,6 @@ app.post('/classes', (req, res) => {
 
 app.post('/events', (req, res) => {  
     let events = [];
-<<<<<<< HEAD
-    onValue(ref(database, '/events'), (snapshot) => {
-        snapshot.forEach(ev => {
-            onValue(ref(database, 'groups/' + ev.val()), (snap) => {
-                if(snap.size < 3)
-=======
-    let headcount = 0;
 
     onValue(ref(database, '/headcount/nr'), (snapshot) => {
         headcount = snapshot.val();
@@ -134,7 +96,6 @@ app.post('/events', (req, res) => {
         snapshot.forEach(ev => {
             onValue(ref(database, 'groups/' + ev.val()), (snap) => {
                 if(snap.size <= headcount)
->>>>>>> 59b79d2 (Legfrisebb)
                     events.push(ev.val());
             });
         });
@@ -175,8 +136,6 @@ app.post('/allevents', (req, res) => {
     });
 });
 
-<<<<<<< HEAD
-=======
 app.post('/headcount', (req, res) => {  
     let headcount = 0;
     onValue(ref(database, '/headcount/nr'), (snapshot) => {
@@ -187,7 +146,6 @@ app.post('/headcount', (req, res) => {
     });
 });
 
->>>>>>> 59b79d2 (Legfrisebb)
 app.post('/admin', (req, res) => {  
     let { user, password } = req.body;
     if(user == 'adminIstvan' && password == 'Isacson93')
