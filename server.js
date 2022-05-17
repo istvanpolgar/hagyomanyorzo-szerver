@@ -63,11 +63,10 @@ app.post('/', (req, res) => {
 });
 
 app.post('/saveheadcount', (req, res) => {
-    let { headcount } = req.body;
-
-    set(ref(database, '/headcount'), {
-        nr: headcount
-    });
+    let { headcounts } = req.body;
+    headcounts.forEach((hc,i)=>{
+        set(ref(database, '/headcount/'+i), hc);
+    })
     res.send({
         message: "Létszám módosítva!"
     });
@@ -87,13 +86,18 @@ app.post('/classes', (req, res) => {
 
 app.post('/events', (req, res) => {  
     let events = [];
+    let headcounts = [];
+    let headcount = 0;
 
-    onValue(ref(database, '/headcount/nr'), (snapshot) => {
-        headcount = snapshot.val();
+    onValue(ref(database, '/headcount'), (snapshot) => {
+        snapshot.forEach(hc => {
+            headcounts.push(hc.val());
+        });
     });
 
     onValue(ref(database, '/events'), (snapshot) => {
         snapshot.forEach(ev => {
+            headcount = headcounts[ev.key];
             onValue(ref(database, 'groups/' + ev.val()), (snap) => {
                 if(snap.size < headcount)
                     events.push(ev.val());
@@ -136,13 +140,47 @@ app.post('/allevents', (req, res) => {
     });
 });
 
-app.post('/headcount', (req, res) => {  
+app.post('/fullevents', (req, res) => {  
+    let fullevents = [];
+    let headcounts = [];
     let headcount = 0;
-    onValue(ref(database, '/headcount/nr'), (snapshot) => {
-        headcount = snapshot.val();
+    let more = 0;
+
+    onValue(ref(database, '/headcount'), (snapshot) => {
+        snapshot.forEach(hc => {
+            headcounts.push(hc.val());
+        });
+    });
+
+    onValue(ref(database, '/events'), (snapshot) => {
+        snapshot.forEach(ev => {
+            headcount = headcounts[ev.key];
+            onValue(ref(database, 'groups/' + ev.val()), (snap) => {
+                if(snap.size == headcount)
+                    fullevents.push(ev.val() + ' - Betelt');
+                else
+                {
+                    more = headcount-snap.size;
+                    fullevents.push(ev.val() + ' - ' + more + ' hely van még');
+                }
+            });
+        });
     }); 
+    
     res.send({
-        headcount: headcount
+        fullevents: fullevents
+    });
+});
+
+app.post('/headcounts', (req, res) => {  
+    let headcounts = [];
+    onValue(ref(database, '/headcount'), (snapshot) => {
+        snapshot.forEach(hc => {
+            headcounts.push(hc.val());
+        });
+    });
+    res.send({
+        headcounts: headcounts
     });
 });
 
